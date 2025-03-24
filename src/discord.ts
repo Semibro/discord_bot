@@ -1,4 +1,4 @@
-import { Client, Events, GatewayIntentBits } from "discord.js";
+import { Client, Events, GatewayIntentBits, TextChannel } from "discord.js";
 import { searchYoutube } from "./youtube";
 import { env } from "./env";
 import { gptResponse } from "./gpt";
@@ -22,8 +22,20 @@ export const checkMessage = async () => client.on("messageCreate", async (messag
     }
 });
 
-export const clientCheck = () => client.once(Events.ClientReady, readyClient => {
+export const clientCheck = () => client.once(Events.ClientReady, async readyClient => {
     console.log("⚡️ 준형 봇이 준비되었습니다!");
+    
+    // 특정 채널에 메시지 보내기
+    try {
+        const channel = await client.channels.fetch(env.DISCORD_CHANNEL_ID ?? "");
+        if (channel && channel instanceof TextChannel) {
+            await channel.send("준형봇이 깊은 잠에서 깨어났습니다!");
+        }
+    } catch (error) {
+        console.error("채널 메시지 전송 실패:", error);
+    }
+
+    readyClient.user.setActivity("준형봇이 깊은 잠에서 깨어났습니다!");
 });
 
 export const clientLogin = () => client.login(env.DISCORD_BOT_TOKEN);
