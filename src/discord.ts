@@ -12,14 +12,14 @@ export const client = new Client({ intents: [
 
 export const checkMessage = async () => client.on("messageCreate", async (message) => {
     const value = message.content;
-    const seperator = value.split("?")[0]
+    const seperator = value.split("?")[0];
     if (seperator === "질문") {
         const res = await gptResponse(value.split("!")[1].trim());
         message.reply(res);
     } else if (seperator === "유튜브") {
         message.reply(await searchYoutube(value.split("?")[1]));
     } else if (seperator === "사용법") {
-        message.reply("준형봇(느낌표) [질문] 으로 질문을 하면 답변을 해드립니다. 유튜브(물음표) [검색어] 로 유튜브 검색을 할 수 있습니다.");
+        message.reply("[질문 / 유튜브 / 사용법](물음표) 를 통해 준형봇을 이용할 수 있습니다!");
     }
 });
 
