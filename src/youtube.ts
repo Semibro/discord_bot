@@ -3,6 +3,7 @@ const youtubeSearchApi = require("youtube-search-api");
 export const searchYoutube = async (searchKeyword: string) => {
     try {
         const searchResult = await youtubeSearchApi.GetListByKeyword(searchKeyword);
+        console.log(`===== YOUTUBE RESPONSE =====\n${JSON.stringify(searchResult, null, 2)}`);
 
         for (const item of searchResult.items) {
             if (item.type === "video") {
