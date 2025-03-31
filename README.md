@@ -1,3 +1,10 @@
 # 디스코드 봇
 
 디스코드에서 여러가지 질문 및 유튜브 검색을 도와주는 봇
+
+### install
+
+```
+brew install yt-dlp
+brew install ffmpeg
+```
