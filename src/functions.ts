@@ -32,7 +32,11 @@ export const getKomentle = async (word: string): Promise<string> => {
     console.log(data);
 
     if (data.guess) {
-        return `유사도: ${data.sim?.toFixed(3) ?? "유사도를 찾지 못했습니다."}  |  순위: ${data.rank}`;
+        if (data.rank === "정답!") {
+            return `축하드립니다! 정답을 맞췄습니다🎉\n유사도: ${data.sim?.toFixed(3) ?? "유사도를 찾지 못했습니다."}  |  순위: ${data.rank}`;
+        } else {
+            return `유사도: ${data.sim?.toFixed(3) ?? "유사도를 찾지 못했습니다."}  |  순위: ${data.rank}`;
+        }
     } else {
         return data.detail?.description ?? "처리할 수 없는 입력입니다.";
     }
