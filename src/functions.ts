@@ -49,7 +49,7 @@ export const playMusic = async (message: OmitPartialGroupDMChannel<Message<boole
     });
 
     connection.on(VoiceConnectionStatus.Ready, () => {
-        console.log("<===== 음성 채널에 성공적으로 연결되었습니다. =====>");
+        console.log(`<===== 음성 채널(${voiceChannel.id})에 성공적으로 연결되었습니다. =====>`);
     });
 
     const ytDlpProcess = spawn('yt-dlp', [
