@@ -14,12 +14,12 @@ export const client = new Client({ intents: [
 
 export const checkMessage = async () => client.on("messageCreate", async (message) => {
     const value = message.content;
-    const seperator = value.split("?")[0];
+    const seperator = value.split("?")[0].trim();
 
     if (["사용법", "도움말", "help"].includes(seperator)) {
         message.reply("- `질문(물음표) 내용` 을 통해 준형봇에게 질문할 수 있습니다!\n- `유튜브(물음표) 검색어` 를 통해서 유튜브를 검색할 수 있습니다.\n- `꼬맨틀(물음표) 단어` 를 통해서 꼬맨틀을 플레이할 수 있습니다.\n- `음악(물음표) 노래 제목` 을 통해서 준형봇에게 음악재생을 시킬 수 있습니다.");
     } else {
-        const keyWord = value.split("?")[1].trim();
+        const keyWord = value.split("?")[1].trim() ?? "";
         if (seperator === "질문") {
             const res = await gptResponse(keyWord);
             message.reply(res);
