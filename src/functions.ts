@@ -1,12 +1,12 @@
 import fetch from "node-fetch";
-import { OmitPartialGroupDMChannel, Message } from "discord.js";
+import { InternalDiscordGatewayAdapterCreator } from "discord.js";
 import {
     AudioPlayerStatus,
     createAudioPlayer,
     createAudioResource,
     VoiceConnectionStatus,
     joinVoiceChannel,
-    AudioPlayer
+    AudioPlayer,
 } from "@discordjs/voice";
 import { Readable } from "stream";
 import { spawn } from "child_process";
@@ -42,18 +42,15 @@ export const getKomentle = async (word: string): Promise<string> => {
     }
 };
 
-export const playMusic = async (message: OmitPartialGroupDMChannel<Message<boolean>>, url: string): Promise<string> => {
-    const voiceChannel = message.member?.voice.channel
-    if (!voiceChannel) return "음성 채널에 접속해주세요!";
-
+export const playMusic = async (cId: string, gId: string, ac: InternalDiscordGatewayAdapterCreator, url: string): Promise<string> => {
     const connection = joinVoiceChannel({
-        channelId: voiceChannel.id,
-        guildId: message.guild?.id ?? "",
-        adapterCreator: message.guild?.voiceAdapterCreator ?? voiceChannel.guild.voiceAdapterCreator,
+        channelId: cId,
+        guildId: gId,
+        adapterCreator: ac,
     });
 
     connection.on(VoiceConnectionStatus.Ready, () => {
-        console.log(`<===== 음성 채널(${voiceChannel.id})에 성공적으로 연결되었습니다. =====>`);
+        console.log(`<===== 음성 채널(${cId})에 성공적으로 연결되었습니다. =====>`);
     });
 
     const ytDlpProcess = spawn('yt-dlp', [
@@ -66,11 +63,7 @@ export const playMusic = async (message: OmitPartialGroupDMChannel<Message<boole
         url
     ]);
 
-    // yt-dlp 프로세스 진행 상황
-    ytDlpProcess.stderr.on("data", (data) => {
-        console.error(`yt-dlp 진행 상황: ${data.toString()}`);
-    });
-
+    // yt-dlp 프로세스 에러 메세지
     ytDlpProcess.on('error', (error) => {
         console.error(`yt-dlp 프로세스 실행 중 오류 발생: ${error.message}`);
         connection.destroy();
@@ -83,6 +76,7 @@ export const playMusic = async (message: OmitPartialGroupDMChannel<Message<boole
     });
 
     const readableStream = new Readable().wrap(ytDlpProcess.stdout);
+
     // 스트림 오류 처리
     readableStream.on('error', (error) => {
         console.error(`오디오 스트림 오류: ${error.message}`);

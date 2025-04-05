@@ -1,6 +1,6 @@
 const youtubeSearchApi = require("youtube-search-api");
 
-export const searchYoutube = async (searchKeyword: string) => {
+export const searchYoutube = async (searchKeyword: string): Promise<string> => {
     try {
         const searchResult = await youtubeSearchApi.GetListByKeyword(searchKeyword);
 
@@ -14,6 +14,6 @@ export const searchYoutube = async (searchKeyword: string) => {
 
     } catch (e) {
         console.log("검색 에러", e);
-        return "검색에 실패했습니다.\n제대로 된 검색어를 입력해주세요!!";
+        return "검색에 실패했습니다.제대로 된 검색어를 입력해주세요!!";
     }
 };
