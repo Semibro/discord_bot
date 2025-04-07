@@ -25,9 +25,10 @@ export const getKomentle = async (word: string): Promise<string> => {
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     const encodeWord = encodeURIComponent(word);
-    const slicedEncodeWord = encodeWord.slice(3);
+    // const slicedEncodeWord = encodeWord.slice(3);
     
-    const response = await fetch(`https://semantle-ko.newsjel.ly/guess/${diffDays}/${slicedEncodeWord}`);
+    // const response = await fetch(`https://semantle-ko.newsjel.ly/guess/${diffDays}/${slicedEncodeWord}`);
+    const response = await fetch(`https://semantle-ko.newsjel.ly/guess/${diffDays}/${encodeWord}`);
     const data = await response.json() as komentleResponseType;
     console.log(data);
 

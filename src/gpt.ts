@@ -28,7 +28,7 @@ export async function gptResponse(message: string): Promise<string> {
         });
         console.log(response);
 
-        return `답변: ${response.choices[0].message.content}\n---\n남은 토큰: ${response.usage?.prompt_tokens}/${response.usage?.total_tokens}`
+        return `### 답변\n${response.choices[0].message.content}\n---\n남은 토큰: ${response.usage?.prompt_tokens}/${response.usage?.total_tokens}`
     } catch (e) {
         console.log(`GPT Response Error: ${e}`);
         return `답변을 생성하는 과정에서 에러가 발생했습니다. 다시 시도해주세요.`;
