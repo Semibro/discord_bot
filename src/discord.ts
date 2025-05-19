@@ -17,7 +17,7 @@ export const checkMessage = async () => client.on("messageCreate", async (messag
     const seperator = value.split("?")[0].trim();
 
     if (["사용법", "도움말", "help"].includes(seperator)) {
-        message.reply("# 사용법\n- `질문(물음표) 내용` 을 통해 준형봇에게 질문할 수 있습니다!\n- `유튜브(물음표) 검색어` 를 통해서 유튜브를 검색할 수 있습니다.\n- `꼬맨틀(물음표) 단어` 를 통해서 꼬맨틀을 플레이할 수 있습니다.\n- `음악(물음표) 노래 제목` 을 통해서 준형봇에게 음악재생을 시킬 수 있습니다.");
+        message.reply("# 사용법\n- `질문(물음표) 내용` 을 통해 준형봇에게 질문할 수 있습니다!\n- `유튜브(물음표) 검색어` 를 통해서 유튜브를 검색할 수 있습니다.\n- `꼬맨틀(물음표) 단어` 를 통해서 꼬맨틀을 플레이할 수 있습니다.\n- `음악(물음표) 노래 제목` 을 통해서 준형봇에게 음악재생을 시킬 수 있습니다.\n- `당근(물음표)` 를 통해서 숨기고 싶은 메시지를 묻어버릴 수 있습니다.");
     } else {
         const keyWord = value.split("?").slice(1).join("");
         if (seperator === "질문") {
@@ -37,6 +37,8 @@ export const checkMessage = async () => client.on("messageCreate", async (messag
                 const adapterCreator = message.guild?.voiceAdapterCreator ?? voiceChannel.guild.voiceAdapterCreator;
                 message.reply(await playMusic(channelId, guildId, adapterCreator, await searchYoutube(keyWord)));
             }
+        } else if (seperator === "당근") {
+            message.reply(`${":carrot:\n".repeat(100)}`);
         }
     }
 });
