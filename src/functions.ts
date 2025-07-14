@@ -53,6 +53,14 @@ const playNextTrack = async (guildId: string): Promise<void> => {
 
     if (queue.currentIndex >= queue.tracks.length) {
         queue.isPlaying = false;
+        queue.tracks = []; // 큐 비우기
+        queue.currentIndex = 0; // 인덱스 초기화
+        
+        if (queue.player) {
+            queue.player.stop();
+            queue.player = undefined;
+        }
+        
         if (queue.connection && queue.connection.state.status !== 'destroyed') {
             try {
                 queue.connection.destroy();
@@ -60,6 +68,8 @@ const playNextTrack = async (guildId: string): Promise<void> => {
                 console.log("연결이 이미 종료되었습니다.");
             }
         }
+        
+        queue.connection = undefined; // 연결 객체 초기화
         return;
     }
 
@@ -152,7 +162,7 @@ export const addToQueue = async (
         await playNextTrack(gId);
         return `🎵 **${title}** 을(를) 재생합니다!`;
     } else {
-        return `🎵 **${title}** 을(를) 큐에 추가했습니다! (대기 중: ${queue.tracks.length - queue.currentIndex - 1}곡)`;
+        return `🎵 **${title}** 을(를) 재생목록에 추가했습니다! (대기 중: ${queue.tracks.length - queue.currentIndex - 1}곡)`;
     }
 };
 
@@ -160,10 +170,10 @@ export const getQueueStatus = (guildId: string): string => {
     const queue = getQueue(guildId);
 
     if (queue.tracks.length === 0) {
-        return "📭 큐가 비어있습니다.";
+        return "📭 재생목록이 비어있습니다.";
     }
 
-    let status = `📋 **음악 큐** (총 ${queue.tracks.length}곡)\n\n`;
+    let status = `📋 **음악 재생목록** (총 ${queue.tracks.length}곡)\n\n`;
 
     queue.tracks.forEach((track, index) => {
         const isCurrent = index === queue.currentIndex && queue.isPlaying;
@@ -190,6 +200,14 @@ export const skipTrack = (guildId: string): string => {
 
     if (queue.currentIndex >= queue.tracks.length) {
         queue.isPlaying = false;
+        queue.tracks = []; // 큐 비우기
+        queue.currentIndex = 0; // 인덱스 초기화
+        
+        if (queue.player) {
+            queue.player.stop();
+            queue.player = undefined;
+        }
+        
         if (queue.connection && queue.connection.state.status !== 'destroyed') {
             try {
                 queue.connection.destroy();
@@ -197,11 +215,13 @@ export const skipTrack = (guildId: string): string => {
                 console.log("연결이 이미 종료되었습니다.");
             }
         }
+        
+        queue.connection = undefined; // 연결 객체 초기화
         return `⏭️ **${skippedTrack.title}** 을(를) 건너뛰었습니다.\n📭 모든 곡이 재생 완료되었습니다.`;
     }
 
     playNextTrack(guildId);
-    return `⏭️ **${skippedTrack.title}** 을(를) 건너뛰고 다음 곡을 재생합니다.`;
+    return `⏭️ **${skippedTrack.title}** 을(를) 건너뛰고 **${queue.tracks[queue.currentIndex].title}**을(를) 재생합니다.`;
 }
 
 export const stopQueue = (guildId: string): string => {
@@ -233,73 +253,3 @@ export const stopQueue = (guildId: string): string => {
 
     return "🛑 음악 재생이 중지되었습니다.";
 }
-
-// export const playMusic = async (cId: string, gId: string, ac: InternalDiscordGatewayAdapterCreator, url: string): Promise<string> => {
-//     const connection = joinVoiceChannel({
-//         channelId: cId,
-//         guildId: gId,
-//         adapterCreator: ac,
-//     });
-
-//     connection.on(VoiceConnectionStatus.Ready, () => {
-//         console.log(`<===== 음성 채널(${cId})에 성공적으로 연결되었습니다. =====>`);
-//     });
-
-//     const ytDlpPath = process.env.YT_DLP_PATH;
-
-//     if (!ytDlpPath) {
-//         console.error("YT_DLP_PATH 환경 변수가 설정되지 않았습니다. .env 파일을 확인해주세요.");
-//         return "Error : yt-dlp 경로에 문제가 발생했습니다.";
-//     }
-//     console.log(`Using yt-dlp from: ${ytDlpPath}`);
-
-//     const ytDlpProcess = spawn(ytDlpPath, [
-//         '-q',
-//         '--no-warnings',
-//         '-f', 'bestaudio',
-//         '--extract-audio',
-//         '--audio-format', 'mp3',
-//         '--output', '-',
-//         url
-//     ]);
-
-//     // yt-dlp 프로세스 에러 메세지
-//     ytDlpProcess.on('error', (error) => {
-//         console.error(`yt-dlp 프로세스 실행 중 오류 발생: ${error.message}`);
-//         connection.destroy();
-//     });
-
-//     ytDlpProcess.on('close', (code) => {
-//         if (code !== 0) {
-//             console.error(`yt-dlp 프로세스가 비정상적으로 종료되었습니다. 종료 코드: ${code}`);
-//         }
-//     });
-
-//     const readableStream = new Readable().wrap(ytDlpProcess.stdout);
-
-//     // 스트림 오류 처리
-//     readableStream.on('error', (error) => {
-//         console.error(`오디오 스트림 오류: ${error.message}`);
-//         connection.destroy();
-//     });
-
-//     const resource = createAudioResource(readableStream);
-//     const player: AudioPlayer = createAudioPlayer();
-
-//     // 플레이어 오류 처리
-//     player.on('error', (error) => {
-//         console.error(`오디오 플레이어 오류: ${error.message}`);
-//         connection.destroy();
-//     });
-
-//     // 오디오 플레이어 상태 변화 처리
-//     player.on(AudioPlayerStatus.Idle, () => {
-//         console.log("재생이 완료되었습니다.");
-//         connection.destroy();
-//     });
-
-//     player.play(resource);
-//     connection.subscribe(player);
-
-//     return `현재 재생음악: ${url}`;
-// };
