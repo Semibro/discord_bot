@@ -8,9 +8,14 @@ import {
     AudioPlayer,
     VoiceConnection,
 } from "@discordjs/voice";
-import { Readable } from "stream";
-import { spawn } from "child_process";
 import play from "play-dl";
+
+// play-dl 초기화
+play.setToken({
+    youtube: {
+        cookie: process.env.YOUTUBE_COOKIE || ""
+    }
+});
 
 type musicTrack = {
     url: string;
@@ -54,8 +59,12 @@ const playNextTrack = async (guildId: string): Promise<void> => {
 
     if (queue.currentIndex >= queue.tracks.length) {
         queue.isPlaying = false;
-        if (queue.connection) {
-            queue.connection.destroy();
+        if (queue.connection && queue.connection.state.status !== 'destroyed') {
+            try {
+                queue.connection.destroy();
+            } catch (error) {
+                console.log("연결이 이미 종료되었습니다.");
+            }
         }
         return;
     }
@@ -170,8 +179,12 @@ export const skipTrack = (guildId: string): string => {
 
     if (queue.currentIndex >= queue.tracks.length) {
         queue.isPlaying = false;
-        if (queue.connection) {
-            queue.connection.destroy();
+        if (queue.connection && queue.connection.state.status !== 'destroyed') {
+            try {
+                queue.connection.destroy();
+            } catch (error) {
+                console.log("연결이 이미 종료되었습니다.");
+            }
         }
         return `⏭️ **${skippedTrack.title}** 을(를) 건너뛰었습니다.\n📭 모든 곡이 재생 완료되었습니다.`;
     }
@@ -195,8 +208,12 @@ export const stopQueue = (guildId: string): string => {
         queue.player.stop();
     }
 
-    if (queue.connection) {
-        queue.connection.destroy();
+    if (queue.connection && queue.connection.state.status !== 'destroyed') {
+        try {
+            queue.connection.destroy();
+        } catch (error) {
+            console.log("연결이 이미 종료되었습니다.");
+        }
     }
 
     return "🛑 음악 재생이 중지되었습니다.";

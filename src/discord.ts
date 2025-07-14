@@ -43,7 +43,12 @@ export const checkMessage = async () => client.on("messageCreate", async (messag
                 const channelId = voiceChannel.id;
                 const guildId = message.guild?.id ?? "";
                 const adapterCreator = message.guild?.voiceAdapterCreator ?? voiceChannel.guild.voiceAdapterCreator;
-                message.reply(await addToQueue(channelId, guildId, adapterCreator, await searchYoutube(keyWord), keyWord));
+                const youtubeUrl = await searchYoutube(keyWord);
+                if (youtubeUrl.startsWith("https://")) {
+                    message.reply(await addToQueue(channelId, guildId, adapterCreator, youtubeUrl, keyWord));
+                } else {
+                    message.reply(youtubeUrl); // 에러 메시지 반환
+                }
             }
         } else if (seperator === "재생목록") {
             message.reply(getQueueStatus(message.guild?.id ?? ""));
