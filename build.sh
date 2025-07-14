@@ -3,8 +3,9 @@
 set -o errexit
 
 echo "===== 1. 시스템 의존성 패키지 설치... ======"
+export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -y ffmpeg
+apt-get install -y ffmpeg python3
 echo "===== 시스템 의존성 패키지 설치 완료. ======"
 
 echo ""
