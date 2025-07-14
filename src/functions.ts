@@ -66,7 +66,7 @@ const playNextTrack = async (guildId: string): Promise<void> => {
     const track = queue.tracks[queue.currentIndex];
 
     try {
-        if (!queue.connection) {
+        if (!queue.connection || queue.connection.state.status === 'destroyed') {
             throw new Error("음성 연결이 없습니다.");
         }
 
@@ -128,7 +128,8 @@ export const addToQueue = async (
 ): Promise<string> => {
     const queue = getQueue(gId);
 
-    if (!queue.connection) {
+    // 연결이 없거나 종료된 상태라면 새로 생성
+    if (!queue.connection || queue.connection.state.status === 'destroyed') {
         queue.connection = joinVoiceChannel({
             channelId: cId,
             guildId: gId,
@@ -162,7 +163,7 @@ export const getQueueStatus = (guildId: string): string => {
         return "📭 큐가 비어있습니다.";
     }
 
-    let status = `📋 **음악 큐** (총 ${queue.tracks.length}곡)`;
+    let status = `📋 **음악 큐** (총 ${queue.tracks.length}곡)\n\n`;
 
     queue.tracks.forEach((track, index) => {
         const isCurrent = index === queue.currentIndex && queue.isPlaying;
@@ -216,6 +217,7 @@ export const stopQueue = (guildId: string): string => {
 
     if (queue.player) {
         queue.player.stop();
+        queue.player = undefined;
     }
 
     if (queue.connection && queue.connection.state.status !== 'destroyed') {
@@ -225,6 +227,9 @@ export const stopQueue = (guildId: string): string => {
             console.log("연결이 이미 종료되었습니다.");
         }
     }
+    
+    // 연결 객체도 초기화
+    queue.connection = undefined;
 
     return "🛑 음악 재생이 중지되었습니다.";
 }
