@@ -7,7 +7,7 @@
     "start": "node dist/index.js",
     "build": "tsc -p .",
     "dev": "nodemon --watch \"src/**/*.ts\" --exec \"ts-node\" src/index.ts",
-    "postinstall": "npm run build"
+    "postinstall": "npm run build && curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o yt-dlp && chmod +x yt-dlp"
   },
   "keywords": [],
   "author": "",

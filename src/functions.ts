@@ -8,14 +8,8 @@ import {
     AudioPlayer,
     VoiceConnection,
 } from "@discordjs/voice";
-import play from "play-dl";
-
-// play-dl 초기화
-play.setToken({
-    youtube: {
-        cookie: process.env.YOUTUBE_COOKIE || ""
-    }
-});
+import { spawn } from "child_process";
+import { Readable } from "stream";
 
 type musicTrack = {
     url: string;
@@ -78,11 +72,25 @@ const playNextTrack = async (guildId: string): Promise<void> => {
 
         console.log("재생할 URL:", track.url);
         
-        // play-dl을 사용하여 스트림 생성
-        const stream = await play.stream(track.url);
-        const resource = createAudioResource(stream.stream, {
-            inputType: stream.type
+        // spawn을 사용하여 yt-dlp로 스트림 생성
+        const ytDlpProcess = spawn('./yt-dlp', [
+            '-q',
+            '--no-warnings',
+            '-f', 'bestaudio',
+            '--extract-audio',
+            '--audio-format', 'mp3',
+            '--output', '-',
+            track.url
+        ]);
+        
+        ytDlpProcess.on('error', (error) => {
+            console.error(`yt-dlp 프로세스 실행 중 오류 발생: ${error.message}`);
+            queue.currentIndex++;
+            playNextTrack(guildId);
         });
+        
+        const readableStream = new Readable().wrap(ytDlpProcess.stdout);
+        const resource = createAudioResource(readableStream);
 
         if (!queue.player) {
             queue.player = createAudioPlayer();
