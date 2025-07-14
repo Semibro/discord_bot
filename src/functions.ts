@@ -54,7 +54,66 @@ export const playMusic = async (cId: string, gId: string, ac: InternalDiscordGat
         console.log(`<===== 음성 채널(${cId})에 성공적으로 연결되었습니다. =====>`);
     });
 
-    const ytDlpProcess = spawn('yt-dlp', [
+    // const ytDlpProcess = spawn('yt-dlp', [
+    //     '-q',
+    //     '--no-warnings',
+    //     '-f', 'bestaudio',
+    //     '--extract-audio',
+    //     '--audio-format', 'mp3',
+    //     '--output', '-',
+    //     url
+    // ]);
+
+    // // yt-dlp 프로세스 에러 메세지
+    // ytDlpProcess.on('error', (error) => {
+    //     console.error(`yt-dlp 프로세스 실행 중 오류 발생: ${error.message}`);
+    //     connection.destroy();
+    // });
+
+    // ytDlpProcess.on('close', (code) => {
+    //     if (code !== 0) {
+    //         console.error(`yt-dlp 프로세스가 비정상적으로 종료되었습니다. 종료 코드: ${code}`);
+    //     }
+    // });
+
+    // const readableStream = new Readable().wrap(ytDlpProcess.stdout);
+
+    // // 스트림 오류 처리
+    // readableStream.on('error', (error) => {
+    //     console.error(`오디오 스트림 오류: ${error.message}`);
+    //     connection.destroy();
+    // });
+
+    // const resource = createAudioResource(readableStream);
+    // const player: AudioPlayer = createAudioPlayer();
+
+    // // 플레이어 오류 처리
+    // player.on('error', (error) => {
+    //     console.error(`오디오 플레이어 오류: ${error.message}`);
+    //     connection.destroy();
+    // });
+
+    // // 오디오 플레이어 상태 변화 처리
+    // player.on(AudioPlayerStatus.Idle, () => {
+    //     console.log("재생이 완료되었습니다.");
+    //     connection.destroy();
+    // });
+
+    // player.play(resource);
+    // connection.subscribe(player);
+
+    // return `현재 재생음악: ${url}`;
+
+    // --- 수정된 코드 ---
+    const ytDlpPath = process.env.YT_DLP_PATH;
+
+    if (!ytDlpPath) {
+        console.error("YT_DLP_PATH 환경 변수가 설정되지 않았습니다. .env 파일을 확인해주세요.");
+        return "Error : yt-dlp 경로에 문제가 발생했습니다.";
+    }
+    console.log(`Using yt-dlp from: ${ytDlpPath}`);
+
+    const ytDlpProcess = spawn(ytDlpPath, [
         '-q',
         '--no-warnings',
         '-f', 'bestaudio',
