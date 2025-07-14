@@ -76,8 +76,16 @@ const playNextTrack = async (guildId: string): Promise<void> => {
             throw new Error("음성 연결이 없습니다.");
         }
 
+        console.log("재생할 URL:", track.url);
+        
+        // URL 유효성 검사 및 정규화
+        let videoUrl = track.url;
+        if (!play.yt_validate(videoUrl)) {
+            throw new Error("유효하지 않은 YouTube URL입니다.");
+        }
+        
         // play-dl을 사용하여 스트림 생성
-        const stream = await play.stream(track.url);
+        const stream = await play.stream(videoUrl);
         const resource = createAudioResource(stream.stream, {
             inputType: stream.type
         });
