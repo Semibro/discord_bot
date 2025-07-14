@@ -10,6 +10,7 @@ import {
 } from "@discordjs/voice";
 import { Readable } from "stream";
 import { spawn } from "child_process";
+import play from "play-dl";
 
 type musicTrack = {
     url: string;
@@ -66,29 +67,11 @@ const playNextTrack = async (guildId: string): Promise<void> => {
             throw new Error("음성 연결이 없습니다.");
         }
 
-        const ytDlpPath = process.env.YT_DLP_PATH;
-        if (!ytDlpPath) {
-            throw new Error("YT_DLP_PATH 환경 변수가 설정되지 않았습니다.");
-        }
-
-        const ytDlpProcess = spawn(ytDlpPath, [
-            '-q',
-            '--no-warnings',
-            '-f', 'bestaudio',
-            '--extract-audio',
-            '--audio-format', 'mp3',
-            '--output', '-',
-            track.url
-        ]);
-
-        ytDlpProcess.on('error', (error) => {
-            console.error(`yt-dlp 프로세스 실행 중 오류 발생: ${error.message}`);
-            queue.currentIndex++;
-            playNextTrack(guildId);
+        // play-dl을 사용하여 스트림 생성
+        const stream = await play.stream(track.url);
+        const resource = createAudioResource(stream.stream, {
+            inputType: stream.type
         });
-
-        const readableStream = new Readable().wrap(ytDlpProcess.stdout);
-        const resource = createAudioResource(readableStream);
 
         if (!queue.player) {
             queue.player = createAudioPlayer();

@@ -70,7 +70,7 @@ export const clientCheck = () => client.once(Events.ClientReady, async readyClie
         console.error("채널 메시지 전송 실패:", error);
     }
 
-    readyClient.user.setActivity("준형봇이 깊은 잠에서 깨어났습니다!");
+    readyClient.user.setActivity("👀 준형봇이 깊은 잠에서 깨어났습니다!");
 });
 
 export const clientLogin = () => client.login(env.DISCORD_BOT_TOKEN);

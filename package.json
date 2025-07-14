@@ -6,7 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/index.js",
     "build": "tsc -p .",
-    "dev": "nodemon --watch \"src/**/*.ts\" --exec \"ts-node\" src/index.ts"
+    "dev": "nodemon --watch \"src/**/*.ts\" --exec \"ts-node\" src/index.ts",
+    "postinstall": "npm run build"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +24,7 @@
     "dotenv": "^16.4.5",
     "node-fetch": "^2.7.0",
     "openai": "^4.73.0",
+    "play-dl": "^1.9.7",
     "youtube-search-api": "^1.2.2",
     "ytdlp-nodejs": "^2.3.0"
   }
