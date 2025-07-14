@@ -13,29 +13,17 @@ pip3 install -U yt-dlp --break-system-packages
 echo "===== yt-dlp 설치 완료. ====="
 
 echo ""
-echo "===== 3. 실행 파일 경로 찾기... ====="
-# pip가 yt-dlp를 어디에 설치했는지 직접 확인하여 경로를 조립합니다.
-# 먼저, yt-dlp 라이브러리 본체의 위치를 확인합니다.
-# 예: /opt/render/.local/lib/python3.11/site-packages
-LOCATION=$(pip3 show yt-dlp | grep Location | awk '{print $2}')
-
-# 실행 파일은 보통 라이브러리 위치의 상위 폴더 아래 bin/ 에 있습니다.
-# 예: /opt/render/.local/bin/yt-dlp
-YT_DLP_PATH="${LOCATION}/../bin/yt-dlp"
+echo "===== 3. 실행 파일 경로 찾기 (전체 시스템 검색)... ====="
+# 서버 전체에서 'yt-dlp' 파일을 찾습니다. 2>/dev/null은 권한 오류를 숨깁니다.
+YT_DLP_PATH=$(find / -name yt-dlp -type f 2>/dev/null | head -n 1)
 
 # ffmpeg는 표준 경로에 있으므로 which로 찾습니다.
 FFMPEG_PATH=$(which ffmpeg)
 
-# 만약을 위해, 조립된 경로에 파일이 실제로 존재하는지 확인합니다.
-if [ ! -f "$YT_DLP_PATH" ]; then
-    echo "오류: 예상 경로에서 yt-dlp 실행 파일을 찾을 수 없습니다: $YT_DLP_PATH
-      "
-    # 대체 수단으로 find 명령어를 사용해 다시 찾아봅니다.
-    YT_DLP_PATH=$(find /opt/render/.local -name yt-dlp -type f | head -n 1)
-    if [ -z "$YT_DLP_PATH" ]; then
-        echo "치명적 오류: yt-dlp 실행 파일을 어디에서도 찾을 수 없습니다."
-        exit 1
-    fi
+# 전체 검색 후에도 파일 경로를 찾지 못했는지 확인합니다.
+if [ -z "$YT_DLP_PATH" ]; then
+    echo "치명적 오류: 'find / -name yt-dlp' 명령어로도 실행 파일을 찾을 수 없습니다."
+    exit 1
 fi
 
 echo "yt-dlp 경로: ${YT_DLP_PATH}"
