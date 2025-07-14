@@ -8,14 +8,7 @@ import {
     AudioPlayer,
     VoiceConnection,
 } from "@discordjs/voice";
-import play from "play-dl";
-
-// play-dl 초기화
-play.setToken({
-    youtube: {
-        cookie: process.env.YOUTUBE_COOKIE || ""
-    }
-});
+import ytdl from "ytdl-core";
 
 type musicTrack = {
     url: string;
@@ -78,11 +71,12 @@ const playNextTrack = async (guildId: string): Promise<void> => {
 
         console.log("재생할 URL:", track.url);
         
-        // play-dl을 사용하여 스트림 생성
-        const stream = await play.stream(track.url);
-        const resource = createAudioResource(stream.stream, {
-            inputType: stream.type
+        // ytdl-core를 사용하여 스트림 생성
+        const stream = ytdl(track.url, {
+            filter: 'audioonly',
+            quality: 'highestaudio',
         });
+        const resource = createAudioResource(stream);
 
         if (!queue.player) {
             queue.player = createAudioPlayer();
