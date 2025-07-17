@@ -10,6 +10,9 @@ import {
 } from "@discordjs/voice";
 import { spawn } from "child_process";
 import { Readable } from "stream";
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
 
 type musicTrack = {
     url: string;
@@ -83,7 +86,13 @@ const playNextTrack = async (guildId: string): Promise<void> => {
         console.log("재생할 URL:", track.url);
         
         // spawn을 사용하여 yt-dlp로 스트림 생성
-        const ytDlpProcess = spawn('yt-dlp', [
+        const cookies = process.env.YOUTUBE_COOKIES;
+        const cookieFilePath = path.join(os.tmpdir(), 'cookies.txt');
+        if (cookies) {
+            fs.writeFileSync(cookieFilePath, cookies);
+        }
+
+        const ytDlpArgs = [
             '--no-check-certificate',
             '--add-header', 'User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
             '-q',
@@ -92,8 +101,15 @@ const playNextTrack = async (guildId: string): Promise<void> => {
             '--extract-audio',
             '--audio-format', 'mp3',
             '--output', '-',
-            track.url
-        ]);
+        ];
+
+        if (cookies) {
+            ytDlpArgs.push('--cookies', cookieFilePath);
+        }
+
+        ytDlpArgs.push(track.url);
+
+        const ytDlpProcess = spawn('yt-dlp', ytDlpArgs);
         
         ytDlpProcess.stderr.on('data', (data) => {
             console.error(`yt-dlp stderr: ${data}`);
