@@ -2,7 +2,7 @@ import { Client, Events, GatewayIntentBits, TextChannel } from "discord.js";
 import { searchYoutube } from "./youtube";
 import { env } from "./env";
 import { gptResponse } from "./gpt";
-import { addToQueue, getQueueStatus, skipTrack, stopQueue } from "./functions";
+import { addToQueue, getQueueStatus, skipTrack, stopQueue } from "./music";
 
 export const client = new Client({ intents: [
     GatewayIntentBits.Guilds,

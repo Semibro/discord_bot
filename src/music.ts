@@ -83,7 +83,7 @@ const playNextTrack = async (guildId: string): Promise<void> => {
         console.log("재생할 URL:", track.url);
         
         // spawn을 사용하여 yt-dlp로 스트림 생성
-        const ytDlpProcess = spawn('./yt-dlp', [
+        const ytDlpProcess = spawn('yt-dlp', [
             '-q',
             '--no-warnings',
             '-f', 'bestaudio',
