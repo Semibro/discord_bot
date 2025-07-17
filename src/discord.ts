@@ -35,27 +35,27 @@ export const checkMessage = async () => client.on("messageCreate", async (messag
             message.reply(res);
         } else if (seperator === "유튜브") {
             message.reply(await searchYoutube(keyWord));
-        } else if (["음악", "노래"].includes(seperator)) {
-            const voiceChannel = message.member?.voice.channel;
-            if (!voiceChannel) {
-                message.reply("음성 채널에 접속해주세요!");
-            } else {
-                const channelId = voiceChannel.id;
-                const guildId = message.guild?.id ?? "";
-                const adapterCreator = message.guild?.voiceAdapterCreator ?? voiceChannel.guild.voiceAdapterCreator;
-                const youtubeUrl = await searchYoutube(keyWord);
-                if (youtubeUrl.startsWith("https://")) {
-                    message.reply(await addToQueue(channelId, guildId, adapterCreator, youtubeUrl, keyWord));
-                } else {
-                    message.reply(youtubeUrl); // 에러 메시지 반환
-                }
-            }
-        } else if (seperator === "재생목록") {
-            message.reply(getQueueStatus(message.guild?.id ?? ""));
-        } else if (["다음노래", "다음음악", "건너뛰기", "다음곡"].includes(seperator)) {
-            message.reply(skipTrack(message.guild?.id ?? ""));
-        } else if (["노래정지", "정지", "음악정지"].includes(seperator)) {
-            message.reply(stopQueue(message.guild?.id ?? ""));
+        // } else if (["음악", "노래"].includes(seperator)) {
+        //     const voiceChannel = message.member?.voice.channel;
+        //     if (!voiceChannel) {
+        //         message.reply("음성 채널에 접속해주세요!");
+        //     } else {
+        //         const channelId = voiceChannel.id;
+        //         const guildId = message.guild?.id ?? "";
+        //         const adapterCreator = message.guild?.voiceAdapterCreator ?? voiceChannel.guild.voiceAdapterCreator;
+        //         const youtubeUrl = await searchYoutube(keyWord);
+        //         if (youtubeUrl.startsWith("https://")) {
+        //             message.reply(await addToQueue(channelId, guildId, adapterCreator, youtubeUrl, keyWord));
+        //         } else {
+        //             message.reply(youtubeUrl); // 에러 메시지 반환
+        //         }
+        //     }
+        // } else if (seperator === "재생목록") {
+        //     message.reply(getQueueStatus(message.guild?.id ?? ""));
+        // } else if (["다음노래", "다음음악", "건너뛰기", "다음곡"].includes(seperator)) {
+        //     message.reply(skipTrack(message.guild?.id ?? ""));
+        // } else if (["노래정지", "정지", "음악정지"].includes(seperator)) {
+        //     message.reply(stopQueue(message.guild?.id ?? ""));
         } else if (seperator === "당근") {
             message.reply(`${":carrot:\n".repeat(100)}`);
         }
@@ -69,7 +69,7 @@ export const clientCheck = () => client.once(Events.ClientReady, async readyClie
     try {
         const channel = await client.channels.fetch(env.DISCORD_CHANNEL_ID ?? "");
         if (channel && channel instanceof TextChannel) {
-            await channel.send("준형봇이 깊은 잠에서 깨어났습니다!");
+            await channel.send("👀 준형봇이 깊은 잠에서 깨어났습니다!");
         }
     } catch (error) {
         console.error("채널 메시지 전송 실패:", error);
