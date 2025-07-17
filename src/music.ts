@@ -93,6 +93,16 @@ const playNextTrack = async (guildId: string): Promise<void> => {
             track.url
         ]);
         
+        ytDlpProcess.stderr.on('data', (data) => {
+            console.error(`yt-dlp stderr: ${data}`);
+        });
+
+        ytDlpProcess.on('exit', (code) => {
+            if (code !== 0) {
+                console.error(`yt-dlp 프로세스가 비정상적으로 종료되었습니다. 종료 코드: ${code}`);
+            }
+        });
+        
         ytDlpProcess.on('error', (error) => {
             console.error(`yt-dlp 프로세스 실행 중 오류 발생: ${error.message}`);
             queue.currentIndex++;
